@@ -11,7 +11,7 @@ async function handler(req: Request): Promise<Response> {
         const build = await Bun.build({
             "entrypoints": ["./ts/index.ts"],
             "outdir": "./public",
-            // minify: true,
+            minify: true,
         });
         if (build.logs.length > 0) {
             console.log(build.logs);
@@ -23,5 +23,6 @@ async function handler(req: Request): Promise<Response> {
 
     const path = `public${url.pathname}`;
     const file = Bun.file(path);
+    console.log(file);
     return new Response(file);
 }

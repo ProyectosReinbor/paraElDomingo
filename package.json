@@ -6,9 +6,9 @@
     "@types/bun": "latest"
   },
   "peerDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "5.0.0"
   },
   "dependencies": {
-    "phaser": "^3.80.1"
+    "phaser": "3.80.1"
   }
 }

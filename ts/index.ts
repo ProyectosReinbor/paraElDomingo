@@ -1,13 +1,23 @@
-import Phaser from "phaser";
+import Phaser, { Physics } from "phaser";
 import { World } from "./world";
-
 const config = {
     type: Phaser.AUTO,
     parent: 'phaser-example',
-    width: 800,
-    height: 600,
+    scale: {
+        mode: Phaser.Scale.FIT,
+        parent: 'tomorrow',
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        width: 1920,
+        height: 1080
+    },
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 0 }
+        }
+    },
     pixelArt: true,
-    scene: World
+    scene: World,
 };
 
 new Phaser.Game(config);

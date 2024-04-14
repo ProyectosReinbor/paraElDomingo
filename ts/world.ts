@@ -1,48 +1,10 @@
-//     create() {
-//         this.map = this.make.tilemap({ key: "map", tileWidth: 32, tileHeight: 32 });
-//         this.tileset = this.map.addTilesetImage("tiles");
-//         this.layer = this.map.createLayer("Level1", this.tileset);
-
-//         this.map.setCollision([20, 48]);
-
-//         this.pickups = this.map.filterTiles(tile => tile.index === 82);
-
-//         this.player = this.add.rectangle(96, 96, 24, 38, 0xffff00);
-
-//         this.physics.add.existing(this.player);
-
-//         this.physics.add.collider(this.player, this.layer);
-
-//         this.cursors = this.input.keyboard.createCursorKeys();
-
-//         this.cursors.up.on("down", () => {
-//             if (this.player.body.blocked.down) {
-//                 this.player.body.setVelocityY(-360);
-//             }
-//         }, this);
-//     }
-
-//     update() {
-//         this.player.body.setVelocityX(0);
-
-//         if (this.cursors.left.isDown) {
-//             this.player.body.setVelocityX(-200);
-//         }
-//         else if (this.cursors.right.isDown) {
-//             this.player.body.setVelocityX(200);
-//         }
-
-//         this.physics.world.overlapTiles(this.player, this.pickups, this.hitPickup, null, this);
-//     }
-
-//     hitPickup(player, tile) {
-//         this.map.removeTile(tile, 29, false);
-
-//         this.pickups = this.map.filterTiles(tile => tile.index === 82);
-//     }
-// }
+import { Pawn } from "./pawn";
+import { Sheep } from "./sheep";
 
 export class World extends Phaser.Scene {
+    pawn: Pawn = new Pawn(this);
+    sheep: Sheep = new Sheep(this);
+
     preload() {
         this.load.image("water", "images/terrain/water/water.png");
         this.load.image("foam", "images/terrain/water/foam.png");
@@ -50,12 +12,16 @@ export class World extends Phaser.Scene {
         this.load.image("shadow", "images/terrain/ground/shadows.png");
         this.load.image("elevation", "images/terrain/ground/elevation.png");
         this.load.tilemapTiledJSON("map", "map/map.json");
-
-        this.load.spritesheet("pawn", "images/factions/knights/troops/pawn/blue.png", { frameWidth: 192, frameHeight: 192 });
+        this.pawn.load();
+        this.sheep.load();
     }
 
     create() {
-        const map = this.make.tilemap({ key: "map", tileWidth: 64, tileHeight: 64 });
+        const map = this.make.tilemap({
+            key: "map",
+            tileWidth: 64,
+            tileHeight: 64,
+        });
         map.addTilesetImage("water", "water");
         map.addTilesetImage("foam", "foam");
         map.addTilesetImage("flat", "flat");
@@ -114,31 +80,12 @@ export class World extends Phaser.Scene {
             floor1.flatWall.setScale(scaleLayer);
             floor1.flatElevation.setScale(scaleLayer);
         }
+        this.pawn.create();
+        this.sheep.create();
+    }
 
-        this.anims.create({
-            key: "idle",
-            frames: this.anims.generateFrameNumbers("pawn", { frames: [0, 1, 2, 3, 4, 5] }),
-            frameRate: 8,
-            repeat: -1
-        });
-
-        this.anims.create({
-            key: "walk",
-            frames: this.anims.generateFrameNumbers("pawn", { frames: [6, 7, 8, 9, 10, 11] }),
-            frameRate: 8,
-            repeat: -1
-        });
-
-        this.anims.create({
-            key: "hammerBlow",
-            frames: this.anims.generateFrameNumbers("pawn", { frames: [12, 13, 14, 15, 16, 17] }),
-            frameRate: 8,
-            repeat: -1,
-            repeatDelay: 1000
-        });
-
-        const pawnSprite = this.add.sprite(250, 300, "pawn");
-        pawnSprite.setScale(1);
-        pawnSprite.play("walk");
+    update(time: number, delta: number) {
+        this.pawn.update(time, delta);
+        this.sheep.update(time, delta);
     }
 }

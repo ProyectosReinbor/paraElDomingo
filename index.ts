@@ -23,6 +23,5 @@ async function handler(req: Request): Promise<Response> {
 
     const path = `public${url.pathname}`;
     const file = Bun.file(path);
-    console.log(file);
     return new Response(file);
 }

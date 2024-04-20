@@ -1,6 +1,8 @@
-import Phaser, { Physics } from "phaser";
+import Phaser from "phaser";
 import { World } from "./world";
-const config = {
+import { Preloader } from "./preloader";
+
+const config: Phaser.Types.Core.GameConfig = {
     type: Phaser.AUTO,
     parent: 'phaser-example',
     scale: {
@@ -17,7 +19,7 @@ const config = {
         }
     },
     pixelArt: true,
-    scene: World,
+    scene: [Preloader, World],
 };
 
 new Phaser.Game(config);

@@ -1,75 +1,83 @@
+import { Assets } from "./assets";
 
-const key: "pawn" = "pawn";
-let sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
-
-export const pawnLoad = (
-    scene: Phaser.Scene,
-) => {
-    scene.load.spritesheet(
-        key,
-        "images/factions/knights/troops/pawn/blue.png",
-        {
-            frameWidth: 192,
-            frameHeight: 192
-        }
-    );
+export const enum PawnAnimations {
+    Idle = `${Assets.Pawn}Idle`,
+    Walk = `${Assets.Pawn}Walk`,
+    HammerBlow = `${Assets.Pawn}HammerBlow`,
 }
 
-export const pawnCreate = (
-    scene: Phaser.Scene,
-) => {
-    scene.anims.create({
-        key: `${key}Idle`,
-        frames: scene.anims.generateFrameNumbers(
-            key,
+export class Pawn {
+    scene: Phaser.Scene;
+    sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
+
+    constructor(scene: Phaser.Scene) {
+        this.scene = scene;
+    }
+
+    static preload(scene: Phaser.Scene) {
+        scene.load.spritesheet(
+            Assets.Pawn,
+            "images/factions/knights/troops/pawn/blue.png",
             {
-                start: 0,
-                end: 5,
+                frameWidth: 192,
+                frameHeight: 192
             }
-        ),
-        frameRate: 8,
-        repeat: -1
-    });
+        );
+    }
 
-    scene.anims.create({
-        key: `${key}Walk`,
-        frames: scene.anims.generateFrameNumbers(
-            key,
-            {
-                start: 6,
-                end: 11,
-            }
-        ),
-        frameRate: 8,
-        repeat: -1
-    });
+    create() {
+        this.scene.anims.create({
+            key: PawnAnimations.Idle,
+            frames: this.scene.anims.generateFrameNumbers(
+                Assets.Pawn,
+                {
+                    start: 0,
+                    end: 5,
+                }
+            ),
+            frameRate: 8,
+            repeat: -1
+        });
 
-    scene.anims.create({
-        key: `${key}HammerBlow`,
-        frames: scene.anims.generateFrameNumbers(
-            key,
-            {
-                start: 12,
-                end: 17
-            }
-        ),
-        frameRate: 8,
-        repeat: -1,
-        repeatDelay: 1000
-    });
+        this.scene.anims.create({
+            key: PawnAnimations.Walk,
+            frames: this.scene.anims.generateFrameNumbers(
+                Assets.Pawn,
+                {
+                    start: 6,
+                    end: 11,
+                }
+            ),
+            frameRate: 8,
+            repeat: -1
+        });
 
-    sprite = scene.physics.add.sprite(250, 300, key);
-    sprite.setScale(1);
-    sprite.anims.play(`${key}Idle`);
-}
+        this.scene.anims.create({
+            key: PawnAnimations.HammerBlow,
+            frames: this.scene.anims.generateFrameNumbers(
+                Assets.Pawn,
+                {
+                    start: 12,
+                    end: 17
+                }
+            ),
+            frameRate: 8,
+            repeat: -1,
+            repeatDelay: 1000
+        });
 
-export const pawnUpdate = (delta: number) => {
-    pawnMove(delta);
-}
+        this.sprite = this.scene.physics.add.sprite(250, 300, Assets.Pawn);
+        this.sprite.setScale(1);
+        this.sprite.anims.play(PawnAnimations.Walk);
+    }
 
-const pawnMove = (delta: number) => {
-    if (sprite !== undefined) {
-        sprite.setVelocityX(10);
-        sprite.setVelocityY(10);
+    update(delta: number) {
+        this.move(delta);
+    }
+
+    move(delta: number) {
+        if (this.sprite === undefined) return;
+        this.sprite.setVelocityX(10);
+        this.sprite.setVelocityY(10);
     }
 }

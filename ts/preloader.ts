@@ -1,4 +1,4 @@
-import { worldLoad } from "./world";
+import { World } from "./world";
 
 export class Preloader extends Phaser.Scene {
     constructor() {
@@ -6,7 +6,7 @@ export class Preloader extends Phaser.Scene {
     }
 
     preload() {
-        worldLoad(this);
+        World.preload(this);
     }
 
     create() {

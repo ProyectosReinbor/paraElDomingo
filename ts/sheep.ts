@@ -1,60 +1,72 @@
-const key: "sheep" = "sheep";
-let sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
-const velocity: number = 30;
+import { Assets } from "./assets";
+import type { Map } from "./map";
 
-export const sheepLoad = (
-    scene: Phaser.Scene,
-) => {
-    scene.load.spritesheet(
-        key,
-        "images/resources/sheep.png",
-        {
-            frameWidth: 64 * 2,
-            frameHeight: 64 * 2,
-        }
-    );
+export const enum SheepAnimations {
+    Idle = `${Assets.Sheep}Idle`,
+    Jump = `${Assets.Sheep}Jump`,
 }
 
-export const sheepCreate = (
-    scene: Phaser.Scene,
-) => {
-    scene.anims.create({
-        key: `${key}Idle`,
-        frames: scene.anims.generateFrameNumbers(
-            key,
+export class Sheep {
+    scene: Phaser.Scene;
+    sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
+    velocity: number = 30;
+
+    constructor(scene: Phaser.Scene) {
+        this.scene = scene;
+    }
+
+    static preload(scene: Phaser.Scene) {
+        scene.load.spritesheet(
+            Assets.Sheep,
+            "images/resources/sheep.png",
             {
-                start: 0,
-                end: 7,
+                frameWidth: 64 * 2,
+                frameHeight: 64 * 2,
             }
-        ),
-        frameRate: 8,
-        repeat: -1
-    });
+        );
+    }
 
-    scene.anims.create({
-        key: `${key}Jump`,
-        frames: scene.anims.generateFrameNumbers(
-            key,
-            {
-                start: 8,
-                end: 13,
-            }
-        ),
-        frameRate: 8,
-    });
+    create() {
+        this.scene.anims.create({
+            key: SheepAnimations.Idle,
+            frames: this.scene.anims.generateFrameNumbers(
+                Assets.Sheep,
+                {
+                    start: 0,
+                    end: 7,
+                }
+            ),
+            frameRate: 8,
+            repeat: -1
+        });
 
-    sprite = scene.physics.add.sprite(250, 300, key);
-    sprite.setScale(1);
-    sprite.anims.play(`${key}Idle`);
-}
+        this.scene.anims.create({
+            key: SheepAnimations.Jump,
+            frames: this.scene.anims.generateFrameNumbers(
+                Assets.Sheep,
+                {
+                    start: 8,
+                    end: 13,
+                }
+            ),
+            frameRate: 8,
+        });
 
-export const sheepUpdate = (delta: number) => {
-    SheepMove(delta);
-}
+        this.sprite = this.scene.physics.add.sprite(250, 900, Assets.Sheep);
+        this.sprite.setScale(1);
+        this.sprite.anims.play(SheepAnimations.Idle);
+        this.sprite.body.setCollideWorldBounds(true);
 
-const SheepMove = (delta: number) => {
-    if (sprite !== undefined) {
-        sprite.setVelocityX(velocity);
-        sprite.setVelocityY(velocity);
+        // scene.physics.world.setBounds(0, 0, 1000, 1000);
+    }
+
+    update(delta: number) {
+        this.move(delta);
+    }
+
+    private move(delta: number) {
+        if (this.sprite === undefined) return;
+        this.sprite.setVelocityX(this.velocity);
+        this.sprite.setVelocityY(-this.velocity);
     }
 }

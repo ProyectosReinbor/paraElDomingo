@@ -1,36 +1,43 @@
-import { Assets } from "./assets";
 import type { Map } from "./map";
+import { Sprite } from "./sprite";
 
-const enum Animations {
-    Idle = `${Assets.Sheep}Idle`,
-    Jump = `${Assets.Sheep}Jump`,
-}
+type Animations = "Idle" | "Jump";
 
-export const SheepPreload = (scene: Phaser.Scene) => {
+const SheepPreload = (
+    scene: Phaser.Scene,
+    key: string
+) => {
     scene.load.spritesheet(
-        Assets.Sheep,
+        key,
         "images/resources/sheep.png",
         {
-            frameWidth: 64 * 2,
-            frameHeight: 64 * 2,
+            frameWidth: 128,
+            frameHeight: 128,
         }
     );
 }
-export class Sheep {
-    private scene: Phaser.Scene;
-    private sprite!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-    private map: Map;
 
-    constructor(scene: Phaser.Scene, map: Map) {
-        this.scene = scene;
+class Sheep extends Sprite {
+    protected map: Map;
+
+    constructor(
+        scene: Phaser.Scene,
+        spriteSheetKey: string,
+        map: Map
+    ) {
+        super(scene, spriteSheetKey);
         this.map = map;
     }
 
-    public create() {
+    protected SheepKeyAnims(animation: Animations) {
+        return `${this.spriteSheetKey}${animation}`;
+    }
+
+    public SheepCreate() {
         this.scene.anims.create({
-            key: Animations.Idle,
+            key: this.SheepKeyAnims("Idle"),
             frames: this.scene.anims.generateFrameNumbers(
-                Assets.Sheep,
+                this.spriteSheetKey,
                 {
                     start: 0,
                     end: 7,
@@ -41,9 +48,9 @@ export class Sheep {
         });
 
         this.scene.anims.create({
-            key: Animations.Jump,
+            key: this.SheepKeyAnims("Jump"),
             frames: this.scene.anims.generateFrameNumbers(
-                Assets.Sheep,
+                this.spriteSheetKey,
                 {
                     start: 8,
                     end: 13,
@@ -52,26 +59,24 @@ export class Sheep {
             frameRate: 8,
         });
 
-        this.sprite = this.scene.physics.add.sprite(250, 900, Assets.Sheep);
-        this.sprite.setSize(50, 50);
-        this.sprite.setScale(1);
-        this.sprite.anims.play(Animations.Idle);
-        this.sprite.body.setCollideWorldBounds(true);
-
-        if (this.map.floor0.water !== null)
-            this.scene.physics.add.collider(this.sprite, this.map.floor0.water);
-
-        if (this.map.floor0.elevation !== null)
-            this.scene.physics.add.collider(this.sprite, this.map.floor0.elevation);
+        this.SpriteCreate(250, 900);
+        this.SpritePhysicsAddCollider(this.map.floor0.water);
+        this.SpritePhysicsAddCollider(this.map.floor0.elevation);
     }
 
-    public update(delta: number) {
-        this.move(delta);
+    public SheepUpdate(delta: number) {
+        this.SpriteMove(delta);
+        this.SheepMove(delta);
     }
 
-    private move(delta: number) {
-        const velocity = 5 * delta;
-        this.sprite.body.setVelocityX(-velocity);
-        this.sprite.body.setVelocityY(-velocity);
+    protected SheepMove(delta: number) {
+
+        if (this.sprite.body.velocity.x < 0) {
+            this.sprite.scaleX = -1;
+            this.sprite.body.offset.x = 85;
+        } else if (this.sprite.body.velocity.x > 0) {
+            this.sprite.scaleX = 1;
+            this.sprite.body.offset.x = 0;
+        }
     }
 }

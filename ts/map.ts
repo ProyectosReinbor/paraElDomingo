@@ -1,3 +1,5 @@
+import { DebugDrawLayer } from "./utils/debug";
+
 export const MapPreload = (scene: Phaser.Scene) => {
     scene.load.image("water", "images/terrain/water/water.png");
     scene.load.image("foam", "images/terrain/water/foam.png");
@@ -84,27 +86,6 @@ export class Map {
         this.floor1.flatElevation?.setScale(scaleLayer);
 
         this.floor1.elevation?.setCollisionByProperty({ collides: true });
-
-        const debugGraphics = this.scene.add.graphics().setAlpha(0.75);
-        this.floor0.elevation?.renderDebug(debugGraphics, {
-            tileColor: null,
-            collidingTileColor: new Phaser.Display.Color(243, 234, 48, 255),
-            faceColor: new Phaser.Display.Color(40, 39, 37, 255),
-        });
-
-        const debugGraphics1 = this.scene.add.graphics().setAlpha(0.75);
-        this.floor1.elevation?.renderDebug(debugGraphics1, {
-            tileColor: null,
-            collidingTileColor: new Phaser.Display.Color(243, 234, 48, 255),
-            faceColor: new Phaser.Display.Color(40, 39, 37, 255),
-        });
-
-        const debugGraphics2 = this.scene.add.graphics().setAlpha(0.75);
-        this.floor0.water?.renderDebug(debugGraphics2, {
-            tileColor: null,
-            collidingTileColor: new Phaser.Display.Color(243, 234, 48, 255),
-            faceColor: new Phaser.Display.Color(40, 39, 37, 255),
-        });
 
         this.scene.physics.world.setBounds(0, 0, 1920, 1080);
     }

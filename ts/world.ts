@@ -1,9 +1,14 @@
-import { Map } from "./map";
-import { Pawn } from "./pawn";
-import { Sheep } from "./sheep";
+import { Map, MapPreload } from "./map";
+import { Pawn, PawnPreload } from "./pawn";
+import { Sheep, SheepPreload } from "./sheep";
+
+export const WorldPreload = (scene: Phaser.Scene) => {
+    MapPreload(scene);
+    PawnPreload(scene);
+    SheepPreload(scene);
+}
 
 export class World extends Phaser.Scene {
-
     map: Map;
     pawn: Pawn;
     sheep: Sheep;
@@ -11,27 +16,18 @@ export class World extends Phaser.Scene {
     constructor() {
         super("world");
         this.map = new Map(this);
-        this.pawn = new Pawn(this);
-        this.sheep = new Sheep(this);
+        this.pawn = new Pawn(this, this.map);
+        this.sheep = new Sheep(this, this.map);
     }
 
-    static preload(
-        scene: Phaser.Scene,
-    ) {
-        Map.preload(scene);
-        Pawn.preload(scene);
-        Sheep.preload(scene);
+    preload() {
+        this.pawn.preload();
     }
-
 
     create() {
         this.map.create();
         this.pawn.create();
         this.sheep.create();
-        if (this.sheep.sprite === undefined) return;
-        if (this.map.layer0Elevation === undefined) return;
-        console.log("addCollider");
-        this.physics.add.collider(this.sheep.sprite, this.map.layer0Elevation);
     }
 
     update(time: number, delta: number) {

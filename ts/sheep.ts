@@ -1,34 +1,34 @@
 import { Assets } from "./assets";
 import type { Map } from "./map";
 
-export const enum SheepAnimations {
+const enum Animations {
     Idle = `${Assets.Sheep}Idle`,
     Jump = `${Assets.Sheep}Jump`,
 }
 
+export const SheepPreload = (scene: Phaser.Scene) => {
+    scene.load.spritesheet(
+        Assets.Sheep,
+        "images/resources/sheep.png",
+        {
+            frameWidth: 64 * 2,
+            frameHeight: 64 * 2,
+        }
+    );
+}
 export class Sheep {
-    scene: Phaser.Scene;
-    sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
-    velocity: number = 30;
+    private scene: Phaser.Scene;
+    private sprite!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+    private map: Map;
 
-    constructor(scene: Phaser.Scene) {
+    constructor(scene: Phaser.Scene, map: Map) {
         this.scene = scene;
+        this.map = map;
     }
 
-    static preload(scene: Phaser.Scene) {
-        scene.load.spritesheet(
-            Assets.Sheep,
-            "images/resources/sheep.png",
-            {
-                frameWidth: 64 * 2,
-                frameHeight: 64 * 2,
-            }
-        );
-    }
-
-    create() {
+    public create() {
         this.scene.anims.create({
-            key: SheepAnimations.Idle,
+            key: Animations.Idle,
             frames: this.scene.anims.generateFrameNumbers(
                 Assets.Sheep,
                 {
@@ -41,7 +41,7 @@ export class Sheep {
         });
 
         this.scene.anims.create({
-            key: SheepAnimations.Jump,
+            key: Animations.Jump,
             frames: this.scene.anims.generateFrameNumbers(
                 Assets.Sheep,
                 {
@@ -53,20 +53,25 @@ export class Sheep {
         });
 
         this.sprite = this.scene.physics.add.sprite(250, 900, Assets.Sheep);
+        this.sprite.setSize(50, 50);
         this.sprite.setScale(1);
-        this.sprite.anims.play(SheepAnimations.Idle);
+        this.sprite.anims.play(Animations.Idle);
         this.sprite.body.setCollideWorldBounds(true);
 
-        // scene.physics.world.setBounds(0, 0, 1000, 1000);
+        if (this.map.floor0.water !== null)
+            this.scene.physics.add.collider(this.sprite, this.map.floor0.water);
+
+        if (this.map.floor0.elevation !== null)
+            this.scene.physics.add.collider(this.sprite, this.map.floor0.elevation);
     }
 
-    update(delta: number) {
+    public update(delta: number) {
         this.move(delta);
     }
 
     private move(delta: number) {
-        if (this.sprite === undefined) return;
-        this.sprite.setVelocityX(this.velocity);
-        this.sprite.setVelocityY(-this.velocity);
+        const velocity = 5 * delta;
+        this.sprite.body.setVelocityX(-velocity);
+        this.sprite.body.setVelocityY(-velocity);
     }
 }

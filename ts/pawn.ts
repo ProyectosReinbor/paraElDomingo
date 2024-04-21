@@ -1,33 +1,41 @@
 import { Assets } from "./assets";
+import type { Map } from "./map";
 
-export const enum PawnAnimations {
+const enum Animations {
     Idle = `${Assets.Pawn}Idle`,
     Walk = `${Assets.Pawn}Walk`,
     HammerBlow = `${Assets.Pawn}HammerBlow`,
 }
 
+export const PawnPreload = (scene: Phaser.Scene) => {
+    scene.load.spritesheet(
+        Assets.Pawn,
+        "images/factions/knights/troops/pawn/blue.png",
+        {
+            frameWidth: 192,
+            frameHeight: 192
+        }
+    );
+}
+
 export class Pawn {
-    scene: Phaser.Scene;
-    sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody | undefined;
+    private scene: Phaser.Scene;
+    private map: Map;
+    private sprite!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+    private cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
 
-    constructor(scene: Phaser.Scene) {
+    constructor(scene: Phaser.Scene, map: Map) {
         this.scene = scene;
+        this.map = map;
     }
 
-    static preload(scene: Phaser.Scene) {
-        scene.load.spritesheet(
-            Assets.Pawn,
-            "images/factions/knights/troops/pawn/blue.png",
-            {
-                frameWidth: 192,
-                frameHeight: 192
-            }
-        );
+    public preload() {
+        this.cursors = this.scene.input.keyboard?.createCursorKeys();
     }
 
-    create() {
+    public create() {
         this.scene.anims.create({
-            key: PawnAnimations.Idle,
+            key: Animations.Idle,
             frames: this.scene.anims.generateFrameNumbers(
                 Assets.Pawn,
                 {
@@ -40,7 +48,7 @@ export class Pawn {
         });
 
         this.scene.anims.create({
-            key: PawnAnimations.Walk,
+            key: Animations.Walk,
             frames: this.scene.anims.generateFrameNumbers(
                 Assets.Pawn,
                 {
@@ -53,7 +61,7 @@ export class Pawn {
         });
 
         this.scene.anims.create({
-            key: PawnAnimations.HammerBlow,
+            key: Animations.HammerBlow,
             frames: this.scene.anims.generateFrameNumbers(
                 Assets.Pawn,
                 {
@@ -67,17 +75,60 @@ export class Pawn {
         });
 
         this.sprite = this.scene.physics.add.sprite(250, 300, Assets.Pawn);
+        this.sprite.body.setSize(64, 64);
         this.sprite.setScale(1);
-        this.sprite.anims.play(PawnAnimations.Walk);
+        this.sprite.anims.play(Animations.Walk);
+        this.sprite.body.setCollideWorldBounds(true);
+
+        if (this.map.floor0.water !== null)
+            this.scene.physics.add.collider(this.sprite, this.map.floor0.water);
+
+        if (this.map.floor0.elevation !== null)
+            this.scene.physics.add.collider(this.sprite, this.map.floor0.elevation);
+
+
+        if (this.map.floor1.elevation !== null)
+            this.scene.physics.add.collider(this.sprite, this.map.floor1.elevation);
     }
 
-    update(delta: number) {
+    public update(delta: number) {
         this.move(delta);
     }
 
-    move(delta: number) {
-        if (this.sprite === undefined) return;
-        this.sprite.setVelocityX(10);
-        this.sprite.setVelocityY(10);
+    private move(delta: number) {
+        const velocity = 5 * delta;
+        let idleX = false;
+
+        if (this.cursors?.left?.isDown) {
+            this.sprite.setVelocityX(-velocity);
+            this.sprite.play(Animations.Walk, true);
+            this.sprite.body.offset.x = 64 * 2;
+            this.sprite.scaleX = -1;
+        }
+        else if (this.cursors?.right?.isDown) {
+            this.sprite.setVelocityX(velocity);
+            this.sprite.play(Animations.Walk, true);
+            this.sprite.body.offset.x = 64;
+            this.sprite.scaleX = 1;
+        }
+        else {
+            idleX = true;
+            this.sprite.setVelocityX(0);
+        }
+
+        if (this.cursors?.up?.isDown) {
+            this.sprite.setVelocityY(-velocity);
+            this.sprite.play(Animations.Walk, true);
+        }
+        else if (this.cursors?.down?.isDown) {
+            this.sprite.setVelocityY(velocity);
+            this.sprite.play(Animations.Walk, true);
+        }
+        else {
+            if (idleX) {
+                this.sprite.play(Animations.Idle, true);
+            }
+            this.sprite.setVelocityY(0);
+        }
     }
 }

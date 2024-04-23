@@ -27,25 +27,26 @@ class Pawn extends Sprite {
         spriteSheetKey: string,
         map: Map
     ) {
-        super(scene, spriteSheetKey);
+        super(
+            scene,
+            spriteSheetKey,
+            5,
+            {
+                left: 115,
+                right: 75
+            }
+        );
         this.map = map;
     }
 
-    protected PawnKeyAnims(animation: Animations) {
-        return `${this.spriteSheetKey}${animation}`;
+    public preload() {
+        this.keyboardCreateCursorsKeys();
     }
 
-    protected PawnAnimsPlay(animation: Animations) {
-        this.sprite.anims.play(
-            this.PawnKeyAnims(animation),
-            true
-        );
-    }
-
-    public PawnCreate() {
-        this.SpriteCreate(250, 300);
+    public create() {
+        this.physicsAddSprite(250, 300);
         this.scene.anims.create({
-            key: this.PawnKeyAnims("Idle"),
+            key: this.keyAnims("Idle"),
             frames: this.scene.anims.generateFrameNumbers(
                 this.spriteSheetKey,
                 {
@@ -58,7 +59,7 @@ class Pawn extends Sprite {
         });
 
         this.scene.anims.create({
-            key: this.PawnKeyAnims("Walk"),
+            key: this.keyAnims("Walk"),
             frames: this.scene.anims.generateFrameNumbers(
                 this.spriteSheetKey,
                 {
@@ -71,7 +72,7 @@ class Pawn extends Sprite {
         });
 
         this.scene.anims.create({
-            key: this.PawnKeyAnims("HammerBlow"),
+            key: this.keyAnims("HammerBlow"),
             frames: this.scene.anims.generateFrameNumbers(
                 this.spriteSheetKey,
                 {
@@ -84,13 +85,24 @@ class Pawn extends Sprite {
             repeatDelay: 1000
         });
 
-        this.SpritePhysicsAddCollider(this.map.floor0.water);
-        this.SpritePhysicsAddCollider(this.map.floor0.elevation);
-        this.SpritePhysicsAddCollider(this.map.floor1.elevation);
+        this.physicsAddCollider(this.map.floor0.water);
+        this.physicsAddCollider(this.map.floor0.elevation);
+        this.physicsAddCollider(this.map.floor1.elevation);
     }
 
-    public PawnUpdate(delta: number) {
-        this.SpriteMove(delta);
+    public update(delta: number) {
+        this.move(delta);
+    }
+
+    protected keyAnims(animation: Animations) {
+        return `${this.spriteSheetKey}${animation}`;
+    }
+
+    protected animsPlay(animation: Animations) {
+        this.sprite.anims.play(
+            this.keyAnims(animation),
+            true
+        );
     }
 }
 

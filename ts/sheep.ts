@@ -25,17 +25,25 @@ class Sheep extends Sprite {
         spriteSheetKey: string,
         map: Map
     ) {
-        super(scene, spriteSheetKey);
+        super(
+            scene,
+            spriteSheetKey,
+            5,
+            {
+                left: 85,
+                right: 45,
+            }
+        );
         this.map = map;
     }
 
-    protected SheepKeyAnims(animation: Animations) {
-        return `${this.spriteSheetKey}${animation}`;
+    public preload() {
+        this.keyboardCreateCursorsKeys();
     }
 
-    public SheepCreate() {
+    public create() {
         this.scene.anims.create({
-            key: this.SheepKeyAnims("Idle"),
+            key: this.keyAnims("Idle"),
             frames: this.scene.anims.generateFrameNumbers(
                 this.spriteSheetKey,
                 {
@@ -48,7 +56,7 @@ class Sheep extends Sprite {
         });
 
         this.scene.anims.create({
-            key: this.SheepKeyAnims("Jump"),
+            key: this.keyAnims("Jump"),
             frames: this.scene.anims.generateFrameNumbers(
                 this.spriteSheetKey,
                 {
@@ -59,24 +67,21 @@ class Sheep extends Sprite {
             frameRate: 8,
         });
 
-        this.SpriteCreate(250, 900);
-        this.SpritePhysicsAddCollider(this.map.floor0.water);
-        this.SpritePhysicsAddCollider(this.map.floor0.elevation);
+        this.physicsAddSprite(250, 900);
+        this.physicsAddCollider(this.map.floor0.water);
+        this.physicsAddCollider(this.map.floor0.elevation);
     }
 
-    public SheepUpdate(delta: number) {
-        this.SpriteMove(delta);
-        this.SheepMove(delta);
+    public update(delta: number) {
+        this.move(delta);
     }
 
-    protected SheepMove(delta: number) {
-
-        if (this.sprite.body.velocity.x < 0) {
-            this.sprite.scaleX = -1;
-            this.sprite.body.offset.x = 85;
-        } else if (this.sprite.body.velocity.x > 0) {
-            this.sprite.scaleX = 1;
-            this.sprite.body.offset.x = 0;
-        }
+    protected keyAnims(animation: Animations) {
+        return `${this.spriteSheetKey}${animation}`;
     }
+}
+
+export {
+    SheepPreload,
+    Sheep
 }

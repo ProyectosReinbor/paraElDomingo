@@ -4,8 +4,8 @@ import { Sheep, SheepPreload } from "./sheep";
 
 export const WorldPreload = (scene: Phaser.Scene) => {
     MapPreload(scene);
-    PawnPreload(scene);
-    SheepPreload(scene);
+    PawnPreload(scene, "panw", "blue");
+    SheepPreload(scene, "sheep");
 }
 
 export class World extends Phaser.Scene {
@@ -16,12 +16,13 @@ export class World extends Phaser.Scene {
     constructor() {
         super("world");
         this.map = new Map(this);
-        this.pawn = new Pawn(this, this.map);
-        this.sheep = new Sheep(this, this.map);
+        this.pawn = new Pawn(this, "panw", this.map);
+        this.sheep = new Sheep(this, "sheep", this.map);
     }
 
     preload() {
         this.pawn.preload();
+        this.sheep.preload();
     }
 
     create() {

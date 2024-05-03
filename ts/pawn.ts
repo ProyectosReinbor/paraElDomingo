@@ -39,10 +39,6 @@ class Pawn extends Sprite {
         this.map = map;
     }
 
-    public preload() {
-        this.keyboardCreateCursorsKeys();
-    }
-
     public create() {
         this.physicsAddSprite(250, 300);
         this.scene.anims.create({
@@ -91,7 +87,7 @@ class Pawn extends Sprite {
     }
 
     public update(delta: number) {
-        this.move(delta);
+        this.setVelocityWithDirections(delta);
     }
 
     protected keyAnims(animation: Animations) {

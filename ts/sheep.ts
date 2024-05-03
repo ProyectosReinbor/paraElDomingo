@@ -19,6 +19,7 @@ const SheepPreload = (
 
 class Sheep extends Sprite {
     protected map: Map;
+    protected randomMotionTimer: number = 0;
 
     constructor(
         scene: Phaser.Scene,
@@ -35,10 +36,6 @@ class Sheep extends Sprite {
             }
         );
         this.map = map;
-    }
-
-    public preload() {
-        this.keyboardCreateCursorsKeys();
     }
 
     public create() {
@@ -73,7 +70,17 @@ class Sheep extends Sprite {
     }
 
     public update(delta: number) {
-        this.move(delta);
+        this.randomMove(delta);
+        this.setVelocityWithDirections(delta);
+    }
+
+    protected randomMove(delta: number) {
+        this.randomMotionTimer += delta;
+        if (this.randomMotionTimer > 5000) {
+            this.randomMotionTimer = 0;
+            this.directions.x = Phaser.Math.RND.pick(["left", "right", "idle"]);
+            this.directions.y = Phaser.Math.RND.pick(["up", "down", "idle"]);
+        }
     }
 
     protected keyAnims(animation: Animations) {

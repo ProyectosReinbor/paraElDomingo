@@ -21,8 +21,6 @@ export class World extends Phaser.Scene {
     }
 
     preload() {
-        this.pawn.preload();
-        this.sheep.preload();
     }
 
     create() {
